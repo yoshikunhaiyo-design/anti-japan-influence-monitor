@@ -8,31 +8,18 @@ on:
 permissions:
   contents: write
 
-concurrency:
-  group: influence-monitor
-  cancel-in-progress: false
-
 jobs:
   monitor:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-
-      - name: Run monitor
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: python src/main.py
-
-      - name: Commit state and reports
-        run: |
+      - run: python src/main.py
+      - run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/state.json reports/
-          git diff --cached --quiet || git commit -m "Update influence monitoring report"
+          git diff --cached --quiet || git commit -m "Update monitoring report"
           git push
